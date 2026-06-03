@@ -5,7 +5,6 @@ import argparse
 import logging
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO)
 
 def check_files(year: int, month: int) -> bool:
     """
