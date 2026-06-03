@@ -1,10 +1,20 @@
+import os
 import requests
 from dotenv import load_dotenv
-from datetime import datetime
 import argparse
-
+import logging
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
+
+def check_files(year: int, month: int) -> bool:
+    """
+        Checks if the file already exists
+
+        Returns:
+            bool: True if the file exists, False otherwise
+    """
+    return os.path.exists(f"./data/raw_{year}_{month}.parquet")
 
 def generate_url(year: int, month: int) -> str:
     """
@@ -32,28 +42,36 @@ def download_parquet_files(year: int, month: int) -> None:
         Returns:
             None
     """
+    if check_files(year=year, month=month):
+        logging.info(f"File {year}-{month:02d} already exists")
+        return
+
     url = generate_url(year=year, month=month)
+    logging.info(f"File url: {url}")
 
     try:
+        logging.info(f"Downloading file for {year}-{month:02d}")
         with requests.get(url=url, stream=True) as req:
             req.raise_for_status()
             with open(f"/opt/airflow/data/landing/raw_{year}_{month}.parquet", "wb") as f:
                 for chunk in req.iter_content(chunk_size=8192):
                     f.write(chunk)
+        logging.info(f"File {year}-{month:02d} downloaded successfully")
     except requests.exceptions.RequestException as e:
-        print(f"Error during download: {e}")
+        logging.error(f"Error during download: {e}")
+        raise
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("start_date", type=str, help="Initial date in yyyy-mm format")
-    parser.add_argument("end_date", type=str, help="End date in yyyy-mm format")
+    parser.add_argument("year", type=str, help="Initial date in yyyy")
+    parser.add_argument("month", type=str, help="End date in mm format")
 
     args = parser.parse_args()
 
-    start_date = datetime.strptime(args.start_date, "%Y-%m")
-    end_date = datetime.strptime(args.end_date, "%Y-%m")
+    year = int(args.year)
+    month = int(args.month)
 
-    ingest_script(start_date=start_date, end_date=end_date)
+    download_parquet_files(year=year, month=month)
     
