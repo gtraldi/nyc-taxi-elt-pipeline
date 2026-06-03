@@ -26,3 +26,9 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Ambientes virtuais Python
+env/
+venv/
+.venv/
+ENV/
