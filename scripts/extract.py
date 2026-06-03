@@ -1,10 +1,9 @@
 import os
 import requests
-from dotenv import load_dotenv
 import argparse
 import logging
+from utils.settings import BASE_URL, LANDING_PATH
 
-load_dotenv()
 
 def check_files(year: int, month: int) -> bool:
     """
@@ -13,7 +12,7 @@ def check_files(year: int, month: int) -> bool:
         Returns:
             bool: True if the file exists, False otherwise
     """
-    return os.path.exists(f"./data/raw_{year}_{month}.parquet")
+    return os.path.exists(f"{LANDING_PATH}/raw_{year}_{month}.parquet")
 
 def generate_url(year: int, month: int) -> str:
     """
@@ -26,11 +25,10 @@ def generate_url(year: int, month: int) -> str:
         Returns:
             str: Url for the file download
     """
-    base_url = os.getenv("BASE_URL")
-    return f"{base_url}{year}-{month:02d}.parquet"
+    return f"{BASE_URL}{year}-{month:02d}.parquet"
 
 
-def download_parquet_files(year: int, month: int) -> None:
+def download_parquet_files(year: int, month: int) -> str:
     """
         Downloads parquet files from NYC TLC for a given period
 
@@ -39,11 +37,13 @@ def download_parquet_files(year: int, month: int) -> None:
             month (int): Month of the file
 
         Returns:
-            None
+            str: The path to the downloaded file
     """
+    os.makedirs(LANDING_PATH, exist_ok=True)
+
     if check_files(year=year, month=month):
         logging.info(f"File {year}-{month:02d} already exists")
-        return
+        return f"{LANDING_PATH}/raw_{year}_{month}.parquet"
 
     url = generate_url(year=year, month=month)
     logging.info(f"File url: {url}")
@@ -52,16 +52,19 @@ def download_parquet_files(year: int, month: int) -> None:
         logging.info(f"Downloading file for {year}-{month:02d}")
         with requests.get(url=url, stream=True) as req:
             req.raise_for_status()
-            with open(f"/opt/airflow/data/landing/raw_{year}_{month}.parquet", "wb") as f:
+            with open(f"{LANDING_PATH}/raw_{year}_{month}.parquet", "wb") as f:
                 for chunk in req.iter_content(chunk_size=8192):
                     f.write(chunk)
         logging.info(f"File {year}-{month:02d} downloaded successfully")
+        return f"{LANDING_PATH}/raw_{year}_{month}.parquet"
     except requests.exceptions.RequestException as e:
         logging.error(f"Error during download: {e}")
         raise
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("year", type=str, help="Initial date in yyyy")
