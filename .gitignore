@@ -32,3 +32,9 @@ env/
 venv/
 .venv/
 ENV/
+
+# data folder
+data/
+
+# Python notebook
+*.ipynb
