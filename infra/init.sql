@@ -22,5 +22,8 @@ CREATE TABLE IF NOT EXISTS raw.nyc_yellow_trip (
     total_amount DOUBLE PRECISION,
     congestion_surcharge DOUBLE PRECISION,
     airport_fee DOUBLE PRECISION,
-    loaded_at TIMESTAMP
+    cbd_congestion_fee DOUBLE PRECISION,
+    loaded_at TIMESTAMP,
+    file_year INTEGER,
+    file_month INTEGER
 );
