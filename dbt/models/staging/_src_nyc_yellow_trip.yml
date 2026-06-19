@@ -3,7 +3,7 @@ version 2:
 sources:
     - name: raw_nyc_data
       database: "{{ env_var('DB_NAME') }}"
-      schema: raw_nyc_data
+      schema: raw
       tables:
         - name: nyc_yellow_trip
           description: Yellow taxi trip records from New York City

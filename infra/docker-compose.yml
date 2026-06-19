@@ -38,6 +38,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-..}/scripts:/opt/airflow/scripts
     - ${AIRFLOW_PROJ_DIR:-..}/data:/opt/airflow/data
     - ${AIRFLOW_PROJ_DIR:-..}/utils:/opt/airflow/utils
+    - ${AIRFLOW_PROJ_DIR:-..}/dbt:/opt/airflow/dbt
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -214,7 +215,7 @@ services:
         echo
         echo "Creating missing opt dirs if missing:"
         echo
-        mkdir -v -p /opt/airflow/{logs,dags,plugins,config}
+        mkdir -v -p /opt/airflow/{logs,dags,plugins,config,dbt}
         echo
         echo "Airflow version:"
         /entrypoint airflow version
@@ -237,7 +238,7 @@ services:
         echo
         echo "Change ownership of files in shared volumes to ${AIRFLOW_UID}:0"
         echo
-        chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config}
+        chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config,dbt}
         echo
         echo "Files in shared volumes:"
         echo
