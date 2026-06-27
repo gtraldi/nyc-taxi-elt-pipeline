@@ -1,0 +1,30 @@
+models:
+  - name: stg_nyc_yellow_trip
+    description: "Cleaned raw yellow taxi data"
+    columns:
+      - name: vendor_id
+        description: "Vendor ID"
+        data_tests:
+          - not_null
+      - name: pickup_datetime
+        description: "Pickup date and time"
+        data_tests:
+          - not_null
+      - name: dropoff_datetime
+        description: "Dropoff date and time"
+        data_tests:
+          - not_null
+      - name: passenger_count
+        description: "Number of passengers"
+        data_tests:
+          - is_positive
+      - name: total_amount
+        description: "Total amount"
+        data_tests:
+          - is_positive
+      - name: trip_distance
+        description: "Trip distance"
+        data_tests:
+          - is_positive
+          
+          

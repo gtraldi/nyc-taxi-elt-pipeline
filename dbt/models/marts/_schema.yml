@@ -1,0 +1,36 @@
+models:
+  - name: fct_daily_metrics
+    description: "Daily aggregated metrics for yellow taxi trips"
+    columns:
+      - name: vendor_id
+        description: "Taxi vendor ID"
+        data_tests:
+          - not_null
+      - name: pickup_date
+        description: "Pickup date"
+        data_tests:
+          - not_null
+      - name: total_trips
+        description: "Total number of trips"
+        data_tests:
+          - not_null
+      - name: total_passengers
+        description: "Total number of passengers"
+        data_tests:
+          - not_null
+      - name: total_distance
+        description: "Total distance in miles"
+        data_tests:
+          - not_null
+      - name: total_revenue
+        description: "Total revenue in dollars"
+        data_tests:
+          - not_null
+      - name: avg_trip_distance
+        description: "Average trip distance in miles"
+        data_tests:
+          - not_null
+      - name: avg_duration_minutes
+        description: "Average trip duration in minutes"
+        data_tests:
+          - not_null

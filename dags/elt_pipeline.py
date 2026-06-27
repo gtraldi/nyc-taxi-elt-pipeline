@@ -6,6 +6,7 @@ from airflow.decorators import dag, task
 from airflow.models.param import Param
 from airflow.exceptions import AirflowSkipException
 from airflow.operators.python import get_current_context
+from airflow.operators.bash import BashOperator
 
 
 @dag(
@@ -130,14 +131,21 @@ def nyc_taxi_elt_pipeline():
 
         logging.info(f"Starting database load for file: {file_path}")
         load_data_to_db(file_path)
-            
+
+    task_dbt = BashOperator(
+        task_id="dbt_run",
+        bash_command="dbt run",
+        cwd="/opt/airflow/dbt"
+    )
 
     periods = generate_periods()
     available_periods = check_source_availability(periods)
 
     extracted_data = extract.expand(period=available_periods)
     loaded_data = load.expand(file_path=extracted_data)
-    
+
+    loaded_data >> task_dbt
+
     
 
 nyc_taxi_elt_pipeline()
