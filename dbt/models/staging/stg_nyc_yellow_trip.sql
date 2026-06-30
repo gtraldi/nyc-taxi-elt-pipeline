@@ -6,7 +6,7 @@ renamed as (
         vendorid as vendor_id,
         tpep_pickup_datetime as pickup_datetime,
         tpep_dropoff_datetime as dropoff_datetime,
-        coalesce(cast(passenger_count as integer),0) as passenger_count,
+        coalesce(cast(passenger_count as integer), 0) as passenger_count,
         cast(trip_distance as numeric(10,2)) as trip_distance,
         cast(ratecodeid as integer) as ratecode_id,
         store_and_fwd_flag,

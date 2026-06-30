@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 
 from airflow.decorators import dag, task
@@ -34,7 +34,7 @@ from airflow.operators.bash import BashOperator
 )
 def nyc_taxi_elt_pipeline():
     @task
-    def generate_periods(**context):
+    def generate_periods(**context) -> list:
         """
         Generates the time periods for the ELT pipeline
         
@@ -44,8 +44,7 @@ def nyc_taxi_elt_pipeline():
         Returns:
             list: A list of tuples containing the year and month for each period
         """
-        context = get_current_context()
-        params = context["params"]
+        params = context.get("params", {})
         start_period = params.get("start_period")
         end_period = params.get("end_period")
 
@@ -56,7 +55,7 @@ def nyc_taxi_elt_pipeline():
             except ValueError:
                 raise ValueError("Invalid date format. Use YYYY-MM.")
         else:
-            start_date = datetime.utcnow().replace(month=1)
+            start_date = datetime.now(timezone.utc).replace(month=1)
             end_date = start_date.replace(month=12)
         
         periods = []
@@ -69,7 +68,7 @@ def nyc_taxi_elt_pipeline():
         return periods
 
     @task
-    def check_source_availability(periods):
+    def check_source_availability(periods: list) -> list:
         """
         Checks if the source file is available for download
         
@@ -95,7 +94,7 @@ def nyc_taxi_elt_pipeline():
         return available_periods
 
     @task
-    def extract(period):
+    def extract(period: tuple) -> str:
         """
         Extracts the data from the source
         
@@ -126,7 +125,7 @@ def nyc_taxi_elt_pipeline():
         return download_parquet_files(period[0], period[1])
 
     @task
-    def load(file_path, **context):
+    def load(file_path: str, **context) -> None:
         """
         Loads the preprocessed Parquet file into the PostgreSQL raw database schema.
         

@@ -1,7 +1,6 @@
-# import sys
 import time
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import pyarrow.parquet as pq
 from sqlalchemy import text
@@ -9,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 from utils.database import db_engine, check_connection
 
 
-def check_data_in_db(year: int, month: int):
+def check_data_in_db(year: int, month: int) -> bool:
     """
     Checks if data already exists in the database
     
@@ -43,7 +42,7 @@ def check_data_in_db(year: int, month: int):
     except Exception as e:
         raise Exception(f"Error trying to check data in the database: {e}")
 
-def load_data_to_db(file_path: str, chunk_size: int = 50000):
+def load_data_to_db(file_path: str, chunk_size: int = 50000) -> None:
     """
     Pre process and load data to the database in chunks
     
@@ -80,7 +79,7 @@ def load_data_to_db(file_path: str, chunk_size: int = 50000):
             for batch in parquet_file.iter_batches(batch_size=chunk_size):
                 df_chunk = batch.to_pandas()
                 df_chunk.columns = df_chunk.columns.str.lower().str.strip()
-                df_chunk["loaded_at"] = datetime.utcnow()
+                df_chunk["loaded_at"] = datetime.now(timezone.utc)
                 df_chunk["file_year"] = int(year)
                 df_chunk["file_month"] = int(month)
 
@@ -110,12 +109,4 @@ def load_data_to_db(file_path: str, chunk_size: int = 50000):
         raise ConnectionError(f"Error in database connection: {e}")
     except Exception as e:
         raise Exception(f"Error trying to load data to the database: {e}")
-
-# if __name__ == "__main__":
-#     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-    
-#     if len(sys.argv) > 1:
-#         load_data_to_db(sys.argv[1])
-#     else:
-#         logging.error("Usage: python -m scripts.load <file_path>")
-#         sys.exit(1)
+
