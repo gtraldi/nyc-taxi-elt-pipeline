@@ -1,16 +1,16 @@
-with staging as (
-	select * from {{ ref('stg_nyc_yellow_trip') }} 
+with enriched_trips_data as (
+	select * from {{ ref('int_nyc_yellow_trip_enriched') }} 
 ),
 prepared_trips_duration as (
 	select
 		*,
 		extract(epoch from (dropoff_datetime - pickup_datetime)) / 60 as duration_minutes
-	from staging
-	where dropoff_datetime > pickup_datetime
+	from enriched_trips_data
 ),
 daily_metrics as (
 	select
 		vendor_id,
+		vendor_name,
 		cast(pickup_datetime as date) as pickup_date,
 		count(*) as total_trips,
 		sum(passenger_count) as total_passengers,
@@ -23,7 +23,7 @@ daily_metrics as (
 		cast(sum(tip_amount) / nullif(sum(fare_amount), 0) * 100 as numeric(12,2)) as tip_percentage,
 		round(avg(duration_minutes)) as avg_duration_minutes
 	from prepared_trips_duration
-	group by vendor_id, pickup_date
+	group by vendor_id, pickup_date, vendor_name
 )
 
 select * from daily_metrics

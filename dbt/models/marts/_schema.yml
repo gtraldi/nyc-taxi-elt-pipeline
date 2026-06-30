@@ -34,3 +34,29 @@ models:
         description: "Average trip duration in minutes"
         data_tests:
           - not_null
+
+  - name: fct_monthly_metrics
+    description: "Monthly aggregated metrics for yellow taxi trips"
+    columns:
+      - name: vendor_id
+        description: "Taxi vendor ID"
+        data_tests:
+          - not_null
+      - name: vendor_name
+        description: "Taxi vendor name"
+        data_tests:
+          - not_null
+      - name: year_month
+        description: "Year and month in YYYY-MM format"
+        data_tests:
+          - not_null
+      - name: total_trips
+        description: "Total number of trips in the month"
+        data_tests:
+          - not_null
+          - is_positive
+      - name: total_revenue
+        description: "Total revenue in dollars for the month"
+        data_tests:
+          - not_null
+          - is_positive

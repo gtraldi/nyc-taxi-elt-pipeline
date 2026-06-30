@@ -1,7 +1,6 @@
-dbt-postgres==1.7.4
+dbt-postgres==1.10.2
 pandas==2.2.0
 pyarrow==15.0.0
 sqlalchemy==2.0.25
 psycopg2-binary==2.9.9
 python-dotenv==1.2.0
-protobuf==4.25.3

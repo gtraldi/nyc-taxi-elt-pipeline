@@ -127,6 +127,12 @@ def nyc_taxi_elt_pipeline():
 
     @task
     def load(file_path, **context):
+        """
+        Loads the preprocessed Parquet file into the PostgreSQL raw database schema.
+        
+        Args:
+            file_path (str): Path to the Parquet file to load.
+        """
         from scripts.load import load_data_to_db
 
         logging.info(f"Starting database load for file: {file_path}")
@@ -134,7 +140,7 @@ def nyc_taxi_elt_pipeline():
 
     task_dbt = BashOperator(
         task_id="dbt_run",
-        bash_command="dbt run",
+        bash_command="dbt seed; dbt run; dbt test",
         cwd="/opt/airflow/dbt"
     )
 

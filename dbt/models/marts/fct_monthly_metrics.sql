@@ -1,16 +1,16 @@
-with staging as (
-	select * from {{ ref('stg_nyc_yellow_trip') }} 
+with enriched_trips_data as (
+	select * from {{ ref('int_nyc_yellow_trip_enriched') }} 
 ),
 prepared_trips_duration as (
 	select
 		*,
 		extract(epoch from (dropoff_datetime - pickup_datetime)) / 60 as duration_minutes
-	from staging
-	where dropoff_datetime > pickup_datetime
+	from enriched_trips_data
 ),
 monthly_metrics as (
 	select
 		vendor_id,
+		vendor_name,
 		count(*) as total_trips,
 		sum(passenger_count) as total_passengers,
 		cast(sum(trip_distance) as numeric(12,2)) as total_distance,
@@ -23,7 +23,7 @@ monthly_metrics as (
 		round(avg(duration_minutes)) as avg_duration_minutes,
 		concat(file_year, '-', lpad(file_month::text, 2, '0')) as year_month
 	from prepared_trips_duration
-	group by vendor_id, year_month
+	group by vendor_id, year_month, vendor_name
 )
 
 select * from monthly_metrics

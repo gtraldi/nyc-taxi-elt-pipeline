@@ -6,7 +6,7 @@ renamed as (
         vendorid as vendor_id,
         tpep_pickup_datetime as pickup_datetime,
         tpep_dropoff_datetime as dropoff_datetime,
-        cast(passenger_count as integer) as passenger_count,
+        coalesce(cast(passenger_count as integer),0) as passenger_count,
         cast(trip_distance as numeric(10,2)) as trip_distance,
         cast(ratecodeid as integer) as ratecode_id,
         store_and_fwd_flag,
@@ -29,6 +29,7 @@ renamed as (
     from source
     where trip_distance >= 0
         and total_amount >= 0
+        and tpep_dropoff_datetime > tpep_pickup_datetime
         and extract(year from tpep_pickup_datetime) = file_year
         and extract(month from tpep_pickup_datetime) = file_month
 )
