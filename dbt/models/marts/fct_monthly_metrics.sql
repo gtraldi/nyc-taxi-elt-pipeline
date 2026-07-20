@@ -1,5 +1,15 @@
+{{ config (
+		materialized='incremental',
+		unique_key=['vendor_id', 'year_month'],
+		incremental_strategy='delete+insert'
+	)
+}}
+
 with enriched_trips_data as (
 	select * from {{ ref('int_nyc_yellow_trip_enriched') }} 
+	{% if is_incremental() %}
+		where concat(file_year, '-', lpad(file_month::text, 2, '0')) >= (select max(year_month) from {{ this }})
+	{% endif %}
 ),
 prepared_trips_duration as (
 	select

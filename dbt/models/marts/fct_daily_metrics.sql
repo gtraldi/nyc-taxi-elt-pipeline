@@ -1,5 +1,15 @@
+{{ config (
+		materialized='incremental',
+		unique_key=['vendor_id', 'pickup_date'],
+		incremental_strategy='delete+insert'
+	)
+}}
+
 with enriched_trips_data as (
 	select * from {{ ref('int_nyc_yellow_trip_enriched') }} 
+	{% if is_incremental() %}
+		where pickup_datetime::date >= (select max(pickup_date) from {{ this }})
+	{% endif %}
 ),
 prepared_trips_duration as (
 	select
