@@ -1,6 +1,5 @@
 import os
 import requests
-# import argparse
 import logging
 from utils.settings import BASE_URL, LANDING_PATH
 
@@ -73,19 +72,4 @@ def download_parquet_files(year: int, month: int) -> str:
         logging.error(f"Error during download: {e}")
         raise
 
-
-# if __name__ == "__main__":
-#     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-#     parser = argparse.ArgumentParser()
-
-#     parser.add_argument("year", type=str, help="Initial date in yyyy")
-#     parser.add_argument("month", type=str, help="End date in mm format")
-
-#     args = parser.parse_args()
-
-#     year = int(args.year)
-#     month = int(args.month)
-
-#     download_parquet_files(year=year, month=month)
-    
+
